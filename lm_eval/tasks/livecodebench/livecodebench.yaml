@@ -1,0 +1,35 @@
+task: livecodebench
+dataset_path: json
+dataset_kwargs:
+  data_files:
+    test:
+      - "hf://datasets/livecodebench/code_generation_lite/test.jsonl"
+      - "hf://datasets/livecodebench/code_generation_lite/test2.jsonl"
+      - "hf://datasets/livecodebench/code_generation_lite/test3.jsonl"
+      - "hf://datasets/livecodebench/code_generation_lite/test4.jsonl"
+      - "hf://datasets/livecodebench/code_generation_lite/test5.jsonl"
+      - "hf://datasets/livecodebench/code_generation_lite/test6.jsonl"
+output_type: generate_until
+validation_split: test
+doc_to_text: !function utils.doc_to_text_with_format
+doc_to_target: !function utils.doc_to_target
+process_results: !function utils.process_results
+num_fewshot: 0
+generation_kwargs:
+  until:
+  - "<|end_of_text|>"
+  - "<|endoftext|>"
+  - "<|im_end|>"
+  # Llama-3.2-3B-Instruct default completion sampling parameters from HuggingFace
+  do_sample: false  # Enable sampling to use temperature/top_p
+  max_gen_toks: 2048  # Changed from max_tokens to max_gen_toks for lm-evaluation-harness compatibility
+  # temperature: 0.6  # Default sampling temperature for Llama-3.2-3B-Instruct
+  # top_p: 0.9  # Default top-p sampling for Llama-3.2-3B-Instruct
+  # top_k: 20  # top-k sampling (not used for default Llama-3.2-3B-Instruct settings)
+  # Note: 'n' parameter not supported in HuggingFace, use multiple runs instead
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0
